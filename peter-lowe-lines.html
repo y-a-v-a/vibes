@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peter Lowe Inspired Lines</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f8f8;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .header-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 10;
+            display: none;
+        }
+        
+        .grid-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .lines-container {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .line {
+            position: absolute;
+            width: 200px;
+            height: 42px;
+            transform-origin: center center;
+            transition: all 0.3s ease;
+        }
+        
+        .line:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+                
+        .line-0 {
+            background:  #e74c3c;
+            transform: rotate(0deg);
+            z-index: 1;
+        }
+        
+        .line-45 {
+            background:  #f39c12;
+            transform: rotate(45deg);
+            z-index: 4;
+        }
+                
+        .line-90 {
+            background:  #2ecc71;
+            transform: rotate(90deg);
+            z-index: 3;
+        }
+                
+        .line-135 {
+            background:  #3498db;
+            transform: rotate(135deg);
+            z-index: 2;
+        }
+        
+        .info {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            background: rgba(255,255,255,0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+        
+        .title {
+            text-align: center;
+            color: #333;
+            font-size: 1.8em;
+            font-weight: bold;
+            background: rgba(255,255,255,0.9);
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin-top: 30px;
+        }
+        
+        .regenerate-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            font-weight: bold;
+        }
+        
+        .regenerate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+
+        @media (max-width: 768px) {
+            .container {
+                width: 600px;
+                height: 600px;
+            }
+            
+            .grid-container {
+                width: 450px;
+                height: 450px;
+                gap: 15px;
+            }
+            
+            .lines-container {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .line {
+                width: 90px;
+                height: 15px;
+            }
+            
+            .title {
+                font-size: 1.4em;
+                padding: 10px 20px;
+            }
+            
+            .info {
+                font-size: 0.8em;
+                padding: 10px 15px;
+            }
+        }
+        
+        /* Color animation for dynamic effect */
+        @keyframes colorShift {
+            0% { filter: hue-rotate(0deg); }
+            25% { filter: hue-rotate(90deg); }
+            50% { filter: hue-rotate(180deg); }
+            75% { filter: hue-rotate(270deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        .color-shift {
+            animation: colorShift 8s infinite linear;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!--<div class="header-container">
+            <div class="title">Peter Lowe Inspired Lines</div>
+            <button class="regenerate-btn" onclick="regenerateColors()">New Colors</button>
+        </div>-->
+        
+        <div class="grid-container" id="grid-container">
+        </div>
+        
+        <!--
+            <div class="info">
+                <strong>Inspired by Peter Lowe (1960s-1970s)</strong><br>
+                3x3 grid of four-line patterns at 0°, 45°, 90°, and 135° angles<br>
+                <em>Hover over lines for interaction • Click "New Colors" to regenerate</em>
+            </div>
+            -->
+    </div>
+
+    <script>
+        // Color palettes inspired by 1960s-70s art
+        const colorPalettes = [
+            // Warm palette
+            [
+                '#e74c3c',
+                '#f39c12',
+                '#2ecc71',
+                '#3498db'
+            ],
+            // Cool palette
+            [
+                '#9b59b6',
+                '#3498db',
+                '#1abc9c',
+                '#34495e'
+            ],
+            // Vibrant 60s palette
+            [
+                '#ff6b6b',
+                '#4ecdc4',
+                '#45b7d1',
+                '#f9ca24'
+            ],
+            // Earth tones
+            [
+                '#d63031',
+                '#00b894',
+                '#fdcb6e',
+                '#6c5ce7'
+            ],
+            // Psychedelic
+            [
+                '#fd79a8',
+                '#fdcb6e',
+                '#00b894',
+                '#6c5ce7'
+            ],
+            // Monochromatic variations
+            [
+                '#2d3436',
+                '#636e72',
+                '#b2bec3',
+                '#ddd'
+            ]
+        ];
+        
+        function getRandomPalette() {
+            return colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+        }
+        
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        function regenerateColors() {
+            const palette = getRandomPalette();
+            const angles = [0, 45, 90, 135];
+            
+            // Group lines by container
+            const containers = {};
+            document.querySelectorAll('.line').forEach((line) => {
+                const containerIndex = parseInt(line.dataset.container);
+                if (!containers[containerIndex]) {
+                    containers[containerIndex] = [];
+                }
+                containers[containerIndex].push(line);
+            });
+            
+            // Apply randomly shuffled colors to each container
+            Object.keys(containers).forEach((containerIndex) => {
+                const shuffledPalette = shuffleArray(palette);
+                const containerLines = containers[containerIndex];
+                
+                containerLines.forEach((line, index) => {
+                    const lineIndex = parseInt(line.dataset.line);
+                    line.style.background = shuffledPalette[index];
+                    
+                });
+            });
+        }
+        
+        // Add click interaction to individual lines
+        document.querySelectorAll('.line').forEach((line, index) => {
+            const angles = [0, 45, 90, 135];
+            const angle = angles[index];
+            
+            line.addEventListener('click', () => {
+                // Cycle through a few colors for this specific line
+                const singleColors = [
+                    '#e74c3c',
+                    '#f39c12',
+                    '#2ecc71',
+                    '#3498db',
+                    '#9b59b6',
+                    '#1abc9c'
+                ];
+                
+                const randomColor = singleColors[Math.floor(Math.random() * singleColors.length)];
+                line.style.background = randomColor;
+            });
+        });
+        
+        function createLineContainers() {
+            const gridContainer = document.getElementById('grid-container');
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const containerSize = 200;
+            
+            // Calculate how many containers fit (add one more row and column)
+            const containersHorizontal = Math.floor(viewportWidth / containerSize) + 1;
+            const containersVertical = Math.floor(viewportHeight / containerSize) + 1;
+            
+            // Calculate offsets to center the grid
+            const horizontalOffset = -(viewportWidth % containerSize) / 2;
+            const verticalOffset = -(viewportHeight % containerSize) / 2;
+            
+            // Clear existing containers
+            gridContainer.innerHTML = '';
+            
+            let containerIndex = 0;
+            
+            // Create containers
+            for (let row = 0; row < containersVertical; row++) {
+                for (let col = 0; col < containersHorizontal; col++) {
+                    const container = document.createElement('div');
+                    container.className = 'lines-container';
+                    container.style.left = (col * containerSize + horizontalOffset) + 'px';
+                    container.style.top = (row * containerSize + verticalOffset) + 'px';
+                    
+                    // Create the four lines for each container
+                    const lineClasses = ['line-0', 'line-45', 'line-90', 'line-135'];
+                    lineClasses.forEach((lineClass, lineIndex) => {
+                        const line = document.createElement('div');
+                        line.className = `line ${lineClass}`;
+                        line.setAttribute('data-container', containerIndex);
+                        line.setAttribute('data-line', lineIndex);
+                        
+                        // Add click interaction
+                        line.addEventListener('click', () => {
+                            const singleColors = [
+                                '#e74c3c',
+                                '#f39c12',
+                                '#2ecc71',
+                                '#3498db',
+                                '#9b59b6',
+                                '#1abc9c'
+                            ];
+                            
+                            const randomColor = singleColors[Math.floor(Math.random() * singleColors.length)];
+                            line.style.background = randomColor;
+                        });
+                        
+                        container.appendChild(line);
+                    });
+                    
+                    gridContainer.appendChild(container);
+                    containerIndex++;
+                }
+            }
+        }
+        
+        // Initialize with random colors on load
+        window.addEventListener('load', () => {
+            createLineContainers();
+            setTimeout(regenerateColors, 1000);
+        });
+        
+        // Recreate containers on window resize
+        window.addEventListener('resize', () => {
+            createLineContainers();
+            setTimeout(regenerateColors, 100);
+        });
+        
+        // Optional: Auto-regenerate colors every 10 seconds
+        // setInterval(regenerateColors, 10000);
+    </script>
+</body>
+</html>

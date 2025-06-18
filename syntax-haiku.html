@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syntax Haiku Generator</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ecf0f1;
+        }
+        
+        .container {
+            max-width: 700px;
+            background: rgba(44, 62, 80, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(236, 240, 241, 0.1);
+        }
+        
+        h1 {
+            color: #3498db;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: bold;
+        }
+        
+        .subtitle {
+            color: #95a5a6;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+        
+        .language-selector {
+            margin-bottom: 30px;
+        }
+        
+        .language-selector label {
+            color: #ecf0f1;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .language-selector select {
+            background: #34495e;
+            color: #ecf0f1;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .haiku-display {
+            background: #1e2832;
+            border: 2px solid #3498db;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .haiku-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .haiku-line {
+            font-size: 1.4em;
+            line-height: 1.8;
+            margin: 10px 0;
+            color: #2ecc71;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        
+        .haiku-line.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .haiku-line:nth-child(1) { 
+            transition-delay: 0.2s; 
+            color: #e74c3c;
+        }
+        .haiku-line:nth-child(2) { 
+            transition-delay: 0.4s; 
+            color: #f39c12;
+        }
+        .haiku-line:nth-child(3) { 
+            transition-delay: 0.6s; 
+            color: #9b59b6;
+        }
+        
+        .syllable-count {
+            font-size: 0.7em;
+            color: #7f8c8d;
+            margin-left: 10px;
+            opacity: 0.8;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            margin: 20px 10px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: #bdc3c7;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        .loading {
+            color: #3498db;
+            font-style: italic;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        .generating {
+            animation: pulse 1s infinite;
+        }
+        
+        .code-snippet {
+            background: #2c3e50;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+            font-family: 'Courier New', monospace;
+            text-align: left;
+            color: #ecf0f1;
+        }
+        
+        .keyword {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .string {
+            color: #2ecc71;
+        }
+        
+        .comment {
+            color: #95a5a6;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{ Syntax Haiku }</h1>
+        <p class="subtitle">Poetry in Programming Language</p>
+        
+        <div class="language-selector">
+            <label for="languageSelect">Choose Language:</label>
+            <select id="languageSelect">
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+                <option value="general">General Programming</option>
+            </select>
+        </div>
+        
+        <div class="haiku-display" id="haikuDisplay">
+            <div class="loading">Click "Compile Haiku" to generate your first syntax haiku!</div>
+        </div>
+        
+        <button class="generate-btn" id="generateBtn" onclick="generateSyntaxHaiku()">
+            Compile Haiku
+        </button>
+        
+        <div class="info">
+            <strong>About Syntax Haikus:</strong><br>
+            These haikus are crafted using programming terminology, keywords, and concepts 
+            while following the traditional 5-7-5 syllable pattern. Each haiku captures 
+            the essence of coding through poetic expression.
+            
+            <div class="code-snippet">
+                <span class="comment">// Example haiku structure</span><br>
+                <span class="keyword">function</span> <span class="string">calls wait</span> <span class="comment">// 5 syllables</span><br>
+                <span class="keyword">variables</span> <span class="string">dance through loops</span> <span class="comment">// 7 syllables</span><br>
+                <span class="keyword">errors</span> <span class="string">bloom like spring</span> <span class="comment">// 5 syllables</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Programming terms organized by syllable count and language
+        const programmingTerms = {
+            javascript: {
+                1: [
+                    {word: 'var', meaning: 'variable declaration'},
+                    {word: 'let', meaning: 'block scope variable'},
+                    {word: 'const', meaning: 'constant value'},
+                    {word: 'null', meaning: 'empty value'},
+                    {word: 'true', meaning: 'boolean true'},
+                    {word: 'false', meaning: 'boolean false'},
+                    {word: 'this', meaning: 'context reference'},
+                    {word: 'new', meaning: 'object creation'},
+                    {word: 'try', meaning: 'error handling'},
+                    {word: 'catch', meaning: 'exception handler'}
+                ],
+                2: [
+                    {word: 'function', meaning: 'code block'},
+                    {word: 'object', meaning: 'data structure'},
+                    {word: 'array', meaning: 'ordered list'},
+                    {word: 'method', meaning: 'object function'},
+                    {word: 'promise', meaning: 'async operation'},
+                    {word: 'async', meaning: 'asynchronous'},
+                    {word: 'await', meaning: 'wait for promise'},
+                    {word: 'import', meaning: 'module loading'},
+                    {word: 'export', meaning: 'module sharing'},
+                    {word: 'console', meaning: 'debug output'}
+                ],
+                3: [
+                    {word: 'callback', meaning: 'function parameter'},
+                    {word: 'closure', meaning: 'scope retention'},
+                    {word: 'prototype', meaning: 'object template'},
+                    {word: 'iterator', meaning: 'loop controller'},
+                    {word: 'generator', meaning: 'yield function'}
+                ]
+            },
+            python: {
+                1: [
+                    {word: 'def', meaning: 'function definition'},
+                    {word: 'class', meaning: 'object blueprint'},
+                    {word: 'if', meaning: 'conditional'},
+                    {word: 'else', meaning: 'alternative'},
+                    {word: 'for', meaning: 'iteration'},
+                    {word: 'while', meaning: 'loop condition'},
+                    {word: 'try', meaning: 'error handling'},
+                    {word: 'pass', meaning: 'placeholder'},
+                    {word: 'None', meaning: 'null value'},
+                    {word: 'True', meaning: 'boolean true'}
+                ],
+                2: [
+                    {word: 'lambda', meaning: 'anonymous function'},
+                    {word: 'import', meaning: 'module loading'},
+                    {word: 'return', meaning: 'value output'},
+                    {word: 'global', meaning: 'scope modifier'},
+                    {word: 'except', meaning: 'exception handler'},
+                    {word: 'finally', meaning: 'cleanup code'},
+                    {word: 'assert', meaning: 'condition check'},
+                    {word: 'yield', meaning: 'generator output'}
+                ],
+                3: [
+                    {word: 'decorator', meaning: 'function wrapper'},
+                    {word: 'generator', meaning: 'lazy iterator'},
+                    {word: 'comprehension', meaning: 'list creation'},
+                    {word: 'exception', meaning: 'error object'}
+                ]
+            },
+            general: {
+                1: [
+                    {word: 'code', meaning: 'instructions'},
+                    {word: 'bug', meaning: 'error'},
+                    {word: 'loop', meaning: 'repetition'},
+                    {word: 'stack', meaning: 'data structure'},
+                    {word: 'heap', meaning: 'memory space'},
+                    {word: 'git', meaning: 'version control'},
+                    {word: 'push', meaning: 'upload code'},
+                    {word: 'pull', meaning: 'download code'},
+                    {word: 'merge', meaning: 'combine branches'},
+                    {word: 'test', meaning: 'verification'}
+                ],
+                2: [
+                    {word: 'debug', meaning: 'fix errors'},
+                    {word: 'compile', meaning: 'build program'},
+                    {word: 'runtime', meaning: 'execution time'},
+                    {word: 'syntax', meaning: 'language rules'},
+                    {word: 'logic', meaning: 'reasoning flow'},
+                    {word: 'server', meaning: 'host machine'},
+                    {word: 'client', meaning: 'user interface'},
+                    {word: 'database', meaning: 'data storage'},
+                    {word: 'framework', meaning: 'code structure'},
+                    {word: 'library', meaning: 'code collection'}
+                ],
+                3: [
+                    {word: 'algorithm', meaning: 'problem solution'},
+                    {word: 'recursion', meaning: 'self-calling'},
+                    {word: 'iteration', meaning: 'repetitive process'},
+                    {word: 'abstraction', meaning: 'simplified view'},
+                    {word: 'encapsulation', meaning: 'data hiding'}
+                ]
+            }
+        };
+
+        // Haiku templates with programming themes
+        const haikuTemplates = [
+            {
+                pattern: [[2,3], [2,2,3], [2,3]],
+                themes: ['creation', 'process', 'completion']
+            },
+            {
+                pattern: [[1,2,2], [3,2,2], [1,2,2]],
+                themes: ['problem', 'solution', 'result']
+            },
+            {
+                pattern: [[3,2], [2,3,2], [3,2]],
+                themes: ['concept', 'implementation', 'outcome']
+            },
+            {
+                pattern: [[1,4], [2,2,3], [2,3]],
+                themes: ['start', 'development', 'finish']
+            }
+        ];
+
+        // Connecting words and phrases
+        const connectors = {
+            1: ['flows', 'runs', 'waits', 'calls', 'loops', 'breaks', 'starts', 'ends'],
+            2: ['dancing', 'flowing', 'calling', 'waiting', 'running', 'breaking', 'building', 'testing'],
+            3: ['elegantly', 'gracefully', 'silently', 'perfectly', 'endlessly']
+        };
+
+        // Poetic endings
+        const poeticEndings = {
+            1: ['spring', 'dawn', 'night', 'light', 'peace', 'joy', 'hope', 'dreams'],
+            2: ['blooming', 'shining', 'flowing', 'growing', 'dancing', 'singing', 'breathing', 'living'],
+            3: ['like morning dew', 'in silence', 'through the night', 'with purpose', 'endlessly']
+        };
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getTermsBySyllables(language, syllableCount) {
+            const terms = programmingTerms[language] || programmingTerms.general;
+            return terms[syllableCount] || [];
+        }
+
+        function generateLine(syllablePattern, language, lineType) {
+            let line = [];
+            let totalSyllables = 0;
+            
+            for (let i = 0; i < syllablePattern.length; i++) {
+                const syllables = syllablePattern[i];
+                let selectedWord;
+                
+                if (i === 0) {
+                    // First word should be a programming term
+                    const availableTerms = getTermsBySyllables(language, syllables);
+                    if (availableTerms.length > 0) {
+                        selectedWord = getRandomElement(availableTerms).word;
+                    }
+                } else if (i === syllablePattern.length - 1 && lineType === 'ending') {
+                    // Last line should have poetic ending
+                    const poeticWords = poeticEndings[syllables] || [];
+                    if (poeticWords.length > 0) {
+                        selectedWord = getRandomElement(poeticWords);
+                    }
+                } else {
+                    // Middle words can be connectors or more terms
+                    const useConnector = Math.random() > 0.5;
+                    if (useConnector && connectors[syllables]) {
+                        selectedWord = getRandomElement(connectors[syllables]);
+                    } else {
+                        const availableTerms = getTermsBySyllables(language, syllables);
+                        if (availableTerms.length > 0) {
+                            selectedWord = getRandomElement(availableTerms).word;
+                        }
+                    }
+                }
+                
+                if (selectedWord) {
+                    line.push(selectedWord);
+                    totalSyllables += syllables;
+                }
+            }
+            
+            return {
+                text: line.join(' '),
+                syllables: totalSyllables
+            };
+        }
+
+        function generateSyntaxHaiku() {
+            const generateBtn = document.getElementById('generateBtn');
+            const haikuDisplay = document.getElementById('haikuDisplay');
+            const languageSelect = document.getElementById('languageSelect');
+            const selectedLanguage = languageSelect.value;
+            
+            // Show generating state
+            generateBtn.textContent = 'Compiling...';
+            generateBtn.classList.add('generating');
+            haikuDisplay.innerHTML = '<div class="loading generating">Parsing syntax into poetry...</div>';
+            
+            setTimeout(() => {
+                const template = getRandomElement(haikuTemplates);
+                const haiku = [];
+                
+                // Generate each line
+                for (let i = 0; i < 3; i++) {
+                    const lineType = i === 2 ? 'ending' : 'normal';
+                    const line = generateLine(template.pattern[i], selectedLanguage, lineType);
+                    haiku.push(line);
+                }
+                
+                // Display the haiku
+                displayHaiku(haiku);
+                
+                // Reset button
+                generateBtn.textContent = 'Compile Another';
+                generateBtn.classList.remove('generating');
+            }, 1200);
+        }
+
+        function displayHaiku(haiku) {
+            const haikuDisplay = document.getElementById('haikuDisplay');
+            haikuDisplay.innerHTML = '';
+            
+            haiku.forEach((line, index) => {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'haiku-line';
+                lineDiv.innerHTML = `${line.text} <span class="syllable-count">(${line.syllables})</span>`;
+                haikuDisplay.appendChild(lineDiv);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    lineDiv.classList.add('show');
+                }, 100 * index);
+            });
+        }
+
+        // Generate first haiku on page load
+        window.addEventListener('load', () => {
+            setTimeout(generateSyntaxHaiku, 500);
+        });
+    </script>
+</body>
+</html>

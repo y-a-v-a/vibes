@@ -187,8 +187,9 @@
         <div class="info">
             <strong>About Color Haikus:</strong><br>
             These color schemes follow the haiku format (5-7-5) using colors from the color wheel. 
-            Each scheme explores different color relationships: complementary, analogous, triadic, and more. 
-            Hover over colors to see their hex values.
+            Each scheme explores different color relationships: complementary, analogous, triadic, pentagonal-septagonal, and more. 
+            The pentagonal-septagonal scheme uses 5-point (72°) and 7-point (51.43°) distributions around the color wheel, 
+            perfectly matching the haiku syllable structure. Hover over colors to see their hex values.
         </div>
     </div>
 
@@ -277,6 +278,37 @@
                         colors.push(hslToHex(hue, saturation, lightness));
                     }
                     return { colors, name: 'Tetradic (Square)' };
+                },
+                
+                // Pentagonal Haiku (5-7-5 pattern)
+                () => {
+                    const colors = [];
+                    
+                    // Line 1: 5 colors using pentagonal distribution (72° apart)
+                    for (let i = 0; i < 5; i++) {
+                        const hue = (baseHue + (i * 72)) % 360;
+                        const lightness = 40 + (i * 5);
+                        const saturation = 65 + (i * 3);
+                        colors.push(hslToHex(hue, saturation, lightness));
+                    }
+                    
+                    // Line 2: 7 colors using septagonal distribution (51.43° apart)
+                    for (let i = 0; i < 7; i++) {
+                        const hue = (baseHue + (i * 51.43)) % 360;
+                        const lightness = 35 + (i * 4);
+                        const saturation = 60 + (i * 2);
+                        colors.push(hslToHex(hue, saturation, lightness));
+                    }
+                    
+                    // Line 3: 5 colors using pentagonal distribution (offset)
+                    for (let i = 0; i < 5; i++) {
+                        const hue = (baseHue + 36 + (i * 72)) % 360; // 36° offset for variation
+                        const lightness = 45 + (i * 4);
+                        const saturation = 70 + (i * 2);
+                        colors.push(hslToHex(hue, saturation, lightness));
+                    }
+                    
+                    return { colors, name: 'Pentagonal-Septagonal Haiku' };
                 }
             ];
             
