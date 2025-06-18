@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NATO Alphabet Haiku Generator</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+        
+        .haiku-display {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .haiku-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .haiku-line {
+            font-size: 1.4em;
+            line-height: 1.6;
+            margin: 8px 0;
+            color: #2c3e50;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+        
+        .haiku-line.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .haiku-line:nth-child(1) { transition-delay: 0.2s; }
+        .haiku-line:nth-child(2) { transition-delay: 0.4s; }
+        .haiku-line:nth-child(3) { transition-delay: 0.6s; }
+        
+        .syllable-count {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-left: 10px;
+            opacity: 0.7;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin: 20px 10px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        
+        .loading {
+            color: #667eea;
+            font-style: italic;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        .generating {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NATO Haiku</h1>
+        <p class="subtitle">Poetry from the Phonetic Alphabet</p>
+        
+        <div class="haiku-display" id="haikuDisplay">
+            <div class="loading">Click "Generate Haiku" to create your first NATO alphabet haiku!</div>
+        </div>
+        
+        <button class="generate-btn" id="generateBtn" onclick="generateHaiku()">
+            Generate Haiku
+        </button>
+        
+        <div class="info">
+            <strong>About NATO Haikus:</strong><br>
+            These haikus are composed using words from the NATO phonetic alphabet (Alpha, Bravo, Charlie, etc.), 
+            following the traditional 5-7-5 syllable pattern. Each haiku creates unique imagery from military communication words.
+        </div>
+    </div>
+
+    <script>
+        // NATO alphabet words with syllable counts and meanings/associations
+        const natoWords = {
+            1: [
+                {word: 'Golf', meaning: 'sport, green fields'},
+                {word: 'Mike', meaning: 'microphone, voice'},
+                {word: 'Zulu', meaning: 'warrior, time zone'}
+            ],
+            2: [
+                {word: 'Alpha', meaning: 'first, beginning'},
+                {word: 'Bravo', meaning: 'applause, courage'},
+                {word: 'Charlie', meaning: 'friend, companion'},
+                {word: 'Delta', meaning: 'river mouth, change'},
+                {word: 'Echo', meaning: 'reflection, sound'},
+                {word: 'Hotel', meaning: 'rest, shelter'},
+                {word: 'India', meaning: 'spices, colors'},
+                {word: 'Kilo', meaning: 'weight, measure'},
+                {word: 'Lima', meaning: 'citrus, green fruit'},
+                {word: 'Oscar', meaning: 'golden statue'},
+                {word: 'Papa', meaning: 'father, protection'},
+                {word: 'Romeo', meaning: 'love, passion'},
+                {word: 'Sierra', meaning: 'mountains, peaks'},
+                {word: 'Tango', meaning: 'dance, rhythm'},
+                {word: 'Uniform', meaning: 'order, sameness'},
+                {word: 'Victor', meaning: 'winner, triumph'},
+                {word: 'Whiskey', meaning: 'amber spirit'},
+                {word: 'Yankee', meaning: 'American, bold'}
+            ],
+            3: [
+                {word: 'Foxtrot', meaning: 'dance, elegance'},
+                {word: 'Juliet', meaning: 'love, balcony'},
+                {word: 'November', meaning: 'autumn, falling'},
+                {word: 'Quebec', meaning: 'French, culture'}
+            ]
+        };
+
+        // Haiku templates for better structure
+        const haikuTemplates = [
+            // Template 1: 2+3, 2+2+3, 2+3
+            {
+                pattern: [[2,3], [2,2,3], [2,3]],
+                themes: ['nature', 'journey', 'reflection']
+            },
+            // Template 2: 1+2+2, 3+2+2, 1+2+2
+            {
+                pattern: [[1,2,2], [3,2,2], [1,2,2]],
+                themes: ['action', 'movement', 'resolution']
+            },
+            // Template 3: 3+2, 2+3+2, 3+2
+            {
+                pattern: [[3,2], [2,3,2], [3,2]],
+                themes: ['emotion', 'memory', 'peace']
+            }
+        ];
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getWordsBySyllables(syllableCount) {
+            return natoWords[syllableCount] || [];
+        }
+
+        function generateLine(syllablePattern) {
+            let line = [];
+            let totalSyllables = 0;
+            
+            for (let syllables of syllablePattern) {
+                const availableWords = getWordsBySyllables(syllables);
+                if (availableWords.length > 0) {
+                    const selectedWord = getRandomElement(availableWords);
+                    line.push(selectedWord.word);
+                    totalSyllables += syllables;
+                }
+            }
+            
+            return {
+                text: line.join(' '),
+                syllables: totalSyllables
+            };
+        }
+
+        function generateHaiku() {
+            const generateBtn = document.getElementById('generateBtn');
+            const haikuDisplay = document.getElementById('haikuDisplay');
+            
+            // Show generating state
+            generateBtn.textContent = 'Generating...';
+            generateBtn.classList.add('generating');
+            haikuDisplay.innerHTML = '<div class="loading generating">Crafting your NATO haiku...</div>';
+            
+            setTimeout(() => {
+                const template = getRandomElement(haikuTemplates);
+                const haiku = [];
+                
+                // Generate each line
+                for (let i = 0; i < 3; i++) {
+                    const line = generateLine(template.pattern[i]);
+                    haiku.push(line);
+                }
+                
+                // Display the haiku
+                displayHaiku(haiku);
+                
+                // Reset button
+                generateBtn.textContent = 'Generate Another';
+                generateBtn.classList.remove('generating');
+            }, 1000);
+        }
+
+        function displayHaiku(haiku) {
+            const haikuDisplay = document.getElementById('haikuDisplay');
+            haikuDisplay.innerHTML = '';
+            
+            haiku.forEach((line, index) => {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'haiku-line';
+                lineDiv.innerHTML = `${line.text} <span class="syllable-count">(${line.syllables})</span>`;
+                haikuDisplay.appendChild(lineDiv);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    lineDiv.classList.add('show');
+                }, 100 * index);
+            });
+        }
+
+        // Generate first haiku on page load
+        window.addEventListener('load', () => {
+            setTimeout(generateHaiku, 500);
+        });
+    </script>
+</body>
+</html>

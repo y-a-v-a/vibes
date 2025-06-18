@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haiku Color Schemes</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(45deg, #f0f0f0, #e8e8e8);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+        
+        .haiku-container {
+            background: #f9f9f9;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+        }
+        
+        .haiku-line {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-block {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.7em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            margin: 2px 0;
+        }
+        
+        .color-block:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-block::after {
+            content: attr(data-color);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7em;
+            color: #666;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .color-block:hover::after {
+            opacity: 1;
+        }
+        
+        .line-label {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            margin: 20px 10px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        .scheme-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(78, 205, 196, 0.1);
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .haiku-line {
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        .haiku-line:nth-child(1) { animation-delay: 0.2s; }
+        .haiku-line:nth-child(2) { animation-delay: 0.4s; }
+        .haiku-line:nth-child(3) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Haiku Color Schemes</h1>
+        <p class="subtitle">Color Harmony in 5-7-5 Format</p>
+        
+        <div class="haiku-container" id="haikuContainer">
+            <div class="haiku-line">
+                <span class="line-label">5 colors</span>
+                <div id="line1"></div>
+            </div>
+            <div class="haiku-line">
+                <span class="line-label">7 colors</span>
+                <div id="line2"></div>
+            </div>
+            <div class="haiku-line">
+                <span class="line-label">5 colors</span>
+                <div id="line3"></div>
+            </div>
+        </div>
+        
+        <div class="scheme-info" id="schemeInfo">
+            Click "Generate New Scheme" to create your first color haiku!
+        </div>
+        
+        <button class="generate-btn" onclick="generateColorHaiku()">
+            Generate New Scheme
+        </button>
+        
+        <div class="info">
+            <strong>About Color Haikus:</strong><br>
+            These color schemes follow the haiku format (5-7-5) using colors from the color wheel. 
+            Each scheme explores different color relationships: complementary, analogous, triadic, and more. 
+            Hover over colors to see their hex values.
+        </div>
+    </div>
+
+    <script>
+        // Color wheel and harmony functions
+        function hslToHex(h, s, l) {
+            l /= 100;
+            const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+        
+        function generateColorScheme() {
+            const baseHue = Math.floor(Math.random() * 360);
+            const schemes = [
+                // Monochromatic
+                () => {
+                    const colors = [];
+                    for (let i = 0; i < 17; i++) {
+                        const lightness = 20 + (i * 5);
+                        colors.push(hslToHex(baseHue, 70, lightness));
+                    }
+                    return { colors, name: 'Monochromatic' };
+                },
+                
+                // Analogous
+                () => {
+                    const colors = [];
+                    for (let i = 0; i < 17; i++) {
+                        const hue = (baseHue + (i * 10)) % 360;
+                        const lightness = 30 + (i * 3);
+                        colors.push(hslToHex(hue, 65, lightness));
+                    }
+                    return { colors, name: 'Analogous' };
+                },
+                
+                // Complementary
+                () => {
+                    const colors = [];
+                    for (let i = 0; i < 17; i++) {
+                        const hue = i % 2 === 0 ? baseHue : (baseHue + 180) % 360;
+                        const lightness = 25 + (i * 4);
+                        const saturation = 60 + (i % 3) * 10;
+                        colors.push(hslToHex(hue, saturation, lightness));
+                    }
+                    return { colors, name: 'Complementary' };
+                },
+                
+                // Triadic
+                () => {
+                    const colors = [];
+                    for (let i = 0; i < 17; i++) {
+                        const hue = (baseHue + (i % 3) * 120) % 360;
+                        const lightness = 30 + (i * 3);
+                        const saturation = 55 + (i % 4) * 8;
+                        colors.push(hslToHex(hue, saturation, lightness));
+                    }
+                    return { colors, name: 'Triadic' };
+                },
+                
+                // Split Complementary
+                () => {
+                    const colors = [];
+                    const hues = [baseHue, (baseHue + 150) % 360, (baseHue + 210) % 360];
+                    for (let i = 0; i < 17; i++) {
+                        const hue = hues[i % 3];
+                        const lightness = 25 + (i * 4);
+                        const saturation = 60 + (i % 2) * 15;
+                        colors.push(hslToHex(hue, saturation, lightness));
+                    }
+                    return { colors, name: 'Split Complementary' };
+                },
+                
+                // Tetradic
+                () => {
+                    const colors = [];
+                    const hues = [baseHue, (baseHue + 90) % 360, (baseHue + 180) % 360, (baseHue + 270) % 360];
+                    for (let i = 0; i < 17; i++) {
+                        const hue = hues[i % 4];
+                        const lightness = 30 + (i * 3);
+                        const saturation = 55 + (i % 3) * 10;
+                        colors.push(hslToHex(hue, saturation, lightness));
+                    }
+                    return { colors, name: 'Tetradic (Square)' };
+                }
+            ];
+            
+            const randomScheme = schemes[Math.floor(Math.random() * schemes.length)];
+            return randomScheme();
+        }
+        
+        function createColorBlock(color) {
+            const block = document.createElement('div');
+            block.className = 'color-block';
+            block.style.backgroundColor = color;
+            block.setAttribute('data-color', color);
+            
+            // Add contrast text color
+            const rgb = parseInt(color.slice(1), 16);
+            const r = (rgb >> 16) & 255;
+            const g = (rgb >> 8) & 255;
+            const b = rgb & 255;
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            block.style.color = brightness > 128 ? '#000' : '#fff';
+            
+            return block;
+        }
+        
+        function generateColorHaiku() {
+            const scheme = generateColorScheme();
+            const colors = scheme.colors;
+            
+            // Clear previous content
+            document.getElementById('line1').innerHTML = '';
+            document.getElementById('line2').innerHTML = '';
+            document.getElementById('line3').innerHTML = '';
+            
+            // Line 1: 5 colors
+            for (let i = 0; i < 5; i++) {
+                document.getElementById('line1').appendChild(createColorBlock(colors[i]));
+            }
+            
+            // Line 2: 7 colors
+            for (let i = 5; i < 12; i++) {
+                document.getElementById('line2').appendChild(createColorBlock(colors[i]));
+            }
+            
+            // Line 3: 5 colors
+            for (let i = 12; i < 17; i++) {
+                document.getElementById('line3').appendChild(createColorBlock(colors[i]));
+            }
+            
+            // Update scheme info
+            document.getElementById('schemeInfo').innerHTML = 
+                `<strong>Color Scheme:</strong> ${scheme.name}<br>
+                <strong>Base Hue:</strong> ${Math.floor(Math.random() * 360)}°<br>
+                <em>Hover over colors to see hex values</em>`;
+        }
+        
+        // Generate initial color haiku
+        window.addEventListener('load', () => {
+            setTimeout(generateColorHaiku, 500);
+        });
+    </script>
+</body>
+</html>
