@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NATO Alphabet Haiku Generator</title>
+    <link rel="icon" href="data:,">
     <style>
         body {
             font-family: 'Georgia', serif;
@@ -162,7 +163,6 @@
             1: [
                 {word: 'Golf', meaning: 'sport, green fields'},
                 {word: 'Mike', meaning: 'microphone, voice'},
-                {word: 'Zulu', meaning: 'warrior, time zone'}
             ],
             2: [
                 {word: 'Alpha', meaning: 'first, beginning'},
@@ -170,25 +170,39 @@
                 {word: 'Charlie', meaning: 'friend, companion'},
                 {word: 'Delta', meaning: 'river mouth, change'},
                 {word: 'Echo', meaning: 'reflection, sound'},
+                {word: 'Foxtrot', meaning: 'dance, elegance'},
                 {word: 'Hotel', meaning: 'rest, shelter'},
-                {word: 'India', meaning: 'spices, colors'},
                 {word: 'Kilo', meaning: 'weight, measure'},
                 {word: 'Lima', meaning: 'citrus, green fruit'},
                 {word: 'Oscar', meaning: 'golden statue'},
                 {word: 'Papa', meaning: 'father, protection'},
-                {word: 'Romeo', meaning: 'love, passion'},
-                {word: 'Sierra', meaning: 'mountains, peaks'},
+                {word: 'Quebec', meaning: 'French, culture'},
                 {word: 'Tango', meaning: 'dance, rhythm'},
-                {word: 'Uniform', meaning: 'order, sameness'},
                 {word: 'Victor', meaning: 'winner, triumph'},
                 {word: 'Whiskey', meaning: 'amber spirit'},
-                {word: 'Yankee', meaning: 'American, bold'}
+                {word: 'X-Ray', meaning: 'vision, transparency'},
+                {word: 'Yankee', meaning: 'American, bold'},
+                {word: 'Zulu', meaning: 'warrior, time zone'},
             ],
             3: [
-                {word: 'Foxtrot', meaning: 'dance, elegance'},
+                {word: 'India', meaning: 'spices, colors'},
                 {word: 'Juliet', meaning: 'love, balcony'},
                 {word: 'November', meaning: 'autumn, falling'},
-                {word: 'Quebec', meaning: 'French, culture'}
+                {word: 'Romeo', meaning: 'love, passion'},
+                {word: 'Sierra', meaning: 'mountains, peaks'},
+                {word: 'Uniform', meaning: 'order, sameness'},
+                {word: 'Unaone', meaning: 'unity, beginning'},
+                {word: 'Bissotwo', meaning: 'duality, balance'},
+                {word: 'Terrathree', meaning: 'earth, foundation'},
+                {word: 'Kartefour', meaning: 'structure, corners'},
+                {word: 'Pantafive', meaning: 'hand, fingers'},
+                {word: 'Soxisix', meaning: 'harmony, music'},
+                {word: 'Setteseven', meaning: 'luck, fortune'},
+                {word: 'Oktoeight', meaning: 'infinity, cycles'},
+                {word: 'Novenine', meaning: 'completion, wisdom'},
+            ],
+            4: [
+                {word: 'Nadazero', meaning: 'void, potential'},
             ]
         };
 
@@ -208,6 +222,46 @@
             {
                 pattern: [[3,2], [2,3,2], [3,2]],
                 themes: ['emotion', 'memory', 'peace']
+            },
+            // Template 4: 1+1+3, 1+3+3, 1+1+3
+            {
+                pattern: [[1,1,3], [1,3,3], [1,1,3]],
+                themes: ['simplicity', 'contrast', 'minimalism']
+            },
+            // Template 5: 2+3, 1+3+3, 2+3
+            {
+                pattern: [[2,3], [1,3,3], [2,3]],
+                themes: ['balance', 'depth', 'symmetry']
+            },
+            // Template 6: 1+4, 3+4, 1+4
+            {
+                pattern: [[1,4], [3,4], [1,4]],
+                themes: ['void, potential', 'emptiness', 'beginning']
+            },
+            // Template 7: 4+1, 4+3, 4+1
+            {
+                pattern: [[4,1], [4,3], [4,1]],
+                themes: ['foundation', 'structure', 'completion']
+            },
+            // Template 8: 4+1, 4+3, 2+3
+            {
+                pattern: [[4,1], [4,3], [2,3]],
+                themes: ['void', 'emergence', 'harmony']
+            },
+            // Template 9: 1+4, 3+4, 1+1+3
+            {
+                pattern: [[1,4], [3,4], [1,1,3]],
+                themes: ['potential', 'expansion', 'simplicity']
+            },
+            // Template 10: 2+3, 1+3+3, 4+1
+            {
+                pattern: [[2,3], [1,3,3], [4,1]],
+                themes: ['balance', 'complexity', 'resolution']
+            },
+            // Template 11: 1+1+3, 2+2+3, 4+1
+            {
+                pattern: [[1,1,3], [2,2,3], [4,1]],
+                themes: ['staccato', 'rhythm', 'finality']
             }
         ];
 
