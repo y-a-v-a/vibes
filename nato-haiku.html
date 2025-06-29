@@ -9,28 +9,62 @@
         body {
             font-family: 'Georgia', serif;
             margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0;
+            background: linear-gradient(135deg, #004890 0%, #1289CB 100%);
             min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .side-panel {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 10;
+        }
+        
+        .side-panel.hidden {
+            transform: translateX(-100%);
+        }
+        
+        .main-content {
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
         }
         
-        .container {
+        .main-content.panel-hidden {
+            margin-left: -350px;
+        }
+        
+        .haiku-container {
             max-width: 600px;
             background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
+            padding: 60px 40px;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             text-align: center;
             backdrop-filter: blur(10px);
         }
         
-        h1 {
+        .panel-title {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .haiku-title {
             color: #333;
             margin-bottom: 10px;
-            font-size: 2.5em;
+            font-size: 3em;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
         
@@ -45,9 +79,9 @@
             background: #f8f9fa;
             border: 2px solid #e9ecef;
             border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-            min-height: 120px;
+            padding: 40px;
+            margin: 40px 0;
+            min-height: 150px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -62,13 +96,13 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
+            background: linear-gradient(90deg, #004890, #1289CB);
         }
         
         .haiku-line {
-            font-size: 1.4em;
-            line-height: 1.6;
-            margin: 8px 0;
+            font-size: 1.6em;
+            line-height: 1.8;
+            margin: 10px 0;
             color: #2c3e50;
             opacity: 0;
             transform: translateY(20px);
@@ -85,28 +119,29 @@
         .haiku-line:nth-child(3) { transition-delay: 0.6s; }
         
         .syllable-count {
-            font-size: 0.8em;
+            font-size: 0.7em;
             color: #7f8c8d;
             margin-left: 10px;
-            opacity: 0.7;
+            opacity: 0.6;
         }
         
         .generate-btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #004890, #1289CB);
             color: white;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.2em;
+            padding: 15px 30px;
+            font-size: 1.1em;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            margin: 20px 10px;
+            box-shadow: 0 4px 15px rgba(0, 72, 144, 0.4);
+            margin: 20px 0;
+            width: 100%;
         }
         
         .generate-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            box-shadow: 0 6px 20px rgba(0, 72, 144, 0.6);
         }
         
         .generate-btn:active {
@@ -114,17 +149,36 @@
         }
         
         .info {
-            margin-top: 30px;
             padding: 20px;
-            background: rgba(102, 126, 234, 0.1);
+            background: rgba(0, 72, 144, 0.1);
             border-radius: 10px;
             font-size: 0.9em;
             color: #555;
+            margin-top: 20px;
+            text-align: left;
         }
         
         .loading {
-            color: #667eea;
+            color: #004890;
             font-style: italic;
+        }
+        
+        .toggle-hint {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #666;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: opacity 0.3s ease;
+            z-index: 20;
+        }
+        
+        .toggle-hint.fade {
+            opacity: 0.3;
         }
         
         @keyframes pulse {
@@ -135,16 +189,31 @@
         .generating {
             animation: pulse 1s infinite;
         }
+        
+        @media (max-width: 768px) {
+            .side-panel {
+                width: 100%;
+                position: fixed;
+                height: 100vh;
+            }
+            
+            .main-content.panel-hidden {
+                margin-left: 0;
+            }
+            
+            .haiku-container {
+                padding: 40px 20px;
+            }
+            
+            .haiku-title {
+                font-size: 2.2em;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>NATO Haiku</h1>
-        <p class="subtitle">Poetry from the Phonetic Alphabet</p>
-        
-        <div class="haiku-display" id="haikuDisplay">
-            <div class="loading">Click "Generate Haiku" to create your first NATO alphabet haiku!</div>
-        </div>
+    <div class="side-panel" id="sidePanel">
+        <h2 class="panel-title">NATO Haiku Generator</h2>
         
         <button class="generate-btn" id="generateBtn" onclick="generateHaiku()">
             Generate Haiku
@@ -152,9 +221,29 @@
         
         <div class="info">
             <strong>About NATO Haikus:</strong><br>
-            These haikus are composed using words from the NATO phonetic alphabet (Alpha, Bravo, Charlie, etc.), 
-            following the traditional 5-7-5 syllable pattern. Each haiku creates unique imagery from military communication words.
+            These haikus are composed using words from the NATO phonetic alphabet (Alpha, Bravo, Charlie, etc.) and numbers (Unaone, Bissotwo, etc.), following the traditional 5-7-5 syllable pattern. Each haiku creates unique imagery from military communication words.
+            
+            <br><br>
+            <strong>Controls:</strong><br>
+            • Press <kbd>H</kbd> to hide/show this panel<br>
+            • Press <kbd>Space</kbd> to generate new haiku<br>
+            • Click anywhere on haiku to generate new one
         </div>
+    </div>
+    
+    <div class="main-content" id="mainContent">
+        <div class="haiku-container">
+            <h1 class="haiku-title">NATO Haiku</h1>
+            <p class="subtitle">Poetry from the Phonetic Alphabet</p>
+            
+            <div class="haiku-display" id="haikuDisplay" onclick="generateHaiku()">
+                <div class="loading">Generating your first NATO alphabet haiku...</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toggle-hint" id="toggleHint">
+        Press <kbd>H</kbd> to hide panel
     </div>
 
     <script>
@@ -265,6 +354,8 @@
             }
         ];
 
+        let panelVisible = true;
+
         function getRandomElement(arr) {
             return arr[Math.floor(Math.random() * arr.length)];
         }
@@ -317,7 +408,7 @@
                 // Reset button
                 generateBtn.textContent = 'Generate Another';
                 generateBtn.classList.remove('generating');
-            }, 1000);
+            }, 800);
         }
 
         function displayHaiku(haiku) {
@@ -336,6 +427,39 @@
                 }, 100 * index);
             });
         }
+
+        function togglePanel() {
+            const sidePanel = document.getElementById('sidePanel');
+            const mainContent = document.getElementById('mainContent');
+            const toggleHint = document.getElementById('toggleHint');
+            
+            panelVisible = !panelVisible;
+            
+            if (panelVisible) {
+                sidePanel.classList.remove('hidden');
+                mainContent.classList.remove('panel-hidden');
+                toggleHint.textContent = 'Press H to hide panel';
+            } else {
+                sidePanel.classList.add('hidden');
+                mainContent.classList.add('panel-hidden');
+                toggleHint.textContent = 'Press H to show panel';
+            }
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', function(event) {
+            if (event.key.toLowerCase() === 'h') {
+                togglePanel();
+            } else if (event.key === ' ') {
+                event.preventDefault();
+                generateHaiku();
+            }
+        });
+
+        // Fade hint after a few seconds
+        setTimeout(() => {
+            document.getElementById('toggleHint').classList.add('fade');
+        }, 3000);
 
         // Generate first haiku on page load
         window.addEventListener('load', () => {
